@@ -21,15 +21,23 @@ export async function GET(request: Request) {
     const client = await clientPromise
     const db = client.db('ScrappoDB')
     
-    // Test the connection explicitly
-    try {
-      await db.command({ ping: 1 })
-    } catch (dbError) {
-      console.error('Database ping failed:', dbError)
-      return NextResponse.json(
-        { error: 'Database unavailable' },
-        { status: 503 }
-      )
+    // Test the connection with retry
+    let retries = 3
+    while (retries > 0) {
+      try {
+        await db.command({ ping: 1 })
+        break
+      } catch (dbError) {
+        retries--
+        if (retries === 0) {
+          console.error('Database ping failed after retries:', dbError)
+          return NextResponse.json(
+            { error: 'Database unavailable' },
+            { status: 503 }
+          )
+        }
+        await new Promise(resolve => setTimeout(resolve, 2000)) // Wait 2 seconds before retry
+      }
     }
     
     const { searchParams } = new URL(request.url)

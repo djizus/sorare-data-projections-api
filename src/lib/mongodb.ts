@@ -11,10 +11,28 @@ const options: MongoClientOptions = {
   serverSelectionTimeoutMS: 10000, // 10 seconds
   maxPoolSize: 10,
   minPoolSize: 1,
+  retryWrites: true,
+  retryReads: true,
+  w: 'majority'
 }
 
 let client: MongoClient
 let clientPromise: Promise<MongoClient>
+
+async function connectToDatabase(): Promise<MongoClient> {
+  try {
+    const newClient = new MongoClient(uri, options)
+    await newClient.connect()
+    await newClient.db('admin').command({ ping: 1 })
+    console.log('MongoDB connected successfully')
+    return newClient
+  } catch (error) {
+    console.error('MongoDB connection error:', error)
+    // Wait 5 seconds before retrying
+    await new Promise(resolve => setTimeout(resolve, 5000))
+    return connectToDatabase()
+  }
+}
 
 if (process.env.NODE_ENV === 'development') {
   // In development mode, use a global variable so that the value
@@ -25,21 +43,13 @@ if (process.env.NODE_ENV === 'development') {
 
   if (!globalWithMongo._mongoClientPromise) {
     client = new MongoClient(uri, options)
-    globalWithMongo._mongoClientPromise = client.connect()
-      .catch(error => {
-        console.error('MongoDB connection error:', error)
-        throw error
-      })
+    globalWithMongo._mongoClientPromise = connectToDatabase()
   }
   clientPromise = globalWithMongo._mongoClientPromise
 } else {
   // In production mode, it's best to not use a global variable.
   client = new MongoClient(uri, options)
-  clientPromise = client.connect()
-    .catch(error => {
-      console.error('MongoDB connection error:', error)
-      throw error
-    })
+  clientPromise = connectToDatabase()
 }
 
 export default clientPromise 
