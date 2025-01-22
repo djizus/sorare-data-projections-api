@@ -1,6 +1,7 @@
 import { getServerSession } from 'next-auth/next'
 import { authOptions } from '@/lib/auth'
 import Link from 'next/link'
+import SignInButton from './components/SignInButton'
 
 export default async function Home() {
   const session = await getServerSession(authOptions)
@@ -20,12 +21,7 @@ export default async function Home() {
             </Link>
           </div>
         ) : (
-          <Link 
-            href="/auth/signin"
-            className="bg-blue-500 text-white px-6 py-2 rounded hover:bg-blue-600"
-          >
-            Sign In with Discord
-          </Link>
+          <SignInButton />
         )}
       </div>
     </div>

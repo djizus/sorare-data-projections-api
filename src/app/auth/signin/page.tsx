@@ -14,6 +14,10 @@ export default function SignIn() {
     }
   }, [status, router])
 
+  const handleSignIn = async () => {
+    await signIn('discord', { callbackUrl: '/' })
+  }
+
   if (status === 'loading') {
     return (
       <div className="flex min-h-screen items-center justify-center">
@@ -28,7 +32,7 @@ export default function SignIn() {
         <div className="text-center space-y-4">
           <h1 className="text-2xl font-bold mb-8">Welcome</h1>
           <button
-            onClick={() => signIn('discord', { callbackUrl: '/' })}
+            onClick={handleSignIn}
             className="flex items-center gap-2 bg-[#5865F2] text-white px-6 py-3 rounded-md hover:bg-[#4752C4] transition-colors"
           >
             Sign in with Discord
