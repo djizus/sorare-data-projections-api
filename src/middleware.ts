@@ -19,6 +19,6 @@ export default withAuth(
 export const config = {
   matcher: [
     '/api/predictions/:path*',
-    // Add other protected routes here
+    '/dashboard/:path*',  // Only protect specific routes
   ]
 } 
