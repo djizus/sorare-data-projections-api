@@ -26,7 +26,7 @@ export async function GET(request: Request) {
     // Create the query
     let query = db
       .collection('sorareDataPredictions')
-      .find({})
+      .find({}, { projection: { _id: 0 } })
       .skip(skip)
 
     // Only apply limit if it's specified in the URL
