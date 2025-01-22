@@ -2,7 +2,7 @@ import NextAuth from 'next-auth'
 import { AuthOptions } from 'next-auth'
 import DiscordProvider from 'next-auth/providers/discord'
 import { mongoAdapter } from '@/lib/mongodb-adapter'
-import { Account, Profile, Session, User } from 'next-auth'
+import { Account, Session, User } from 'next-auth'
 import { JWT } from 'next-auth/jwt'
 
 // Discord requires specific scope permissions
@@ -24,7 +24,7 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ account, profile }) {
+    async signIn({ account }) {
       if (account?.provider === 'discord') {
         const guildsResponse = await fetch('https://discord.com/api/users/@me/guilds', {
           headers: {
