@@ -2,9 +2,17 @@ import NextAuth from 'next-auth'
 import { AuthOptions } from 'next-auth'
 import DiscordProvider from 'next-auth/providers/discord'
 import { mongoAdapter } from '@/lib/mongodb-adapter'
+import { Account, Profile, Session, User } from 'next-auth'
+import { JWT } from 'next-auth/jwt'
 
 // Discord requires specific scope permissions
 const scopes = ['identify', 'guilds'].join(' ')
+
+interface DiscordGuild {
+  id: string;
+  name: string;
+  permissions: string;
+}
 
 export const authOptions: AuthOptions = {
   adapter: mongoAdapter,
@@ -16,36 +24,32 @@ export const authOptions: AuthOptions = {
     }),
   ],
   callbacks: {
-    async signIn({ account, profile }: any) {
-      if (account.provider === 'discord') {
-        // Fetch user's guilds using the access token
+    async signIn({ account, profile }) {
+      if (account?.provider === 'discord') {
         const guildsResponse = await fetch('https://discord.com/api/users/@me/guilds', {
           headers: {
             Authorization: `Bearer ${account.access_token}`,
           },
         })
         
-        const guilds = await guildsResponse.json()
-        
-        // Check if user is in your server
-        // Replace YOUR_SERVER_ID with your Discord server ID
-        const isInServer = guilds.some((guild: any) => guild.id === process.env.DISCORD_SERVER_ID)
-        
-        return isInServer
+        const guilds = (await guildsResponse.json()) as DiscordGuild[]
+        return guilds.some((guild) => guild.id === process.env.DISCORD_SERVER_ID)
       }
       return false
     },
-    async jwt({ token, account, profile }: any) {
-      if (account) {
+    async jwt({ token, account, user }: { token: JWT; account: Account | null; user: User | null }) {
+      if (account && user) {
         token.accessToken = account.access_token
-        token.discordId = profile.id
+        token.discordId = user.id
       }
       return token
     },
-    async session({ session, token }: any) {
-      session.accessToken = token.accessToken
-      session.discordId = token.discordId
-      return session
+    async session({ session, token }: { session: Session; token: JWT }) {
+      return {
+        ...session,
+        accessToken: token.accessToken,
+        discordId: token.discordId,
+      }
     },
   },
   pages: {
