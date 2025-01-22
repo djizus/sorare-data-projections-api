@@ -16,7 +16,6 @@ const options: MongoClientOptions = {
   w: 'majority'
 }
 
-let client: MongoClient
 let clientPromise: Promise<MongoClient>
 
 async function connectToDatabase(): Promise<MongoClient> {
@@ -42,13 +41,11 @@ if (process.env.NODE_ENV === 'development') {
   }
 
   if (!globalWithMongo._mongoClientPromise) {
-    client = new MongoClient(uri, options)
     globalWithMongo._mongoClientPromise = connectToDatabase()
   }
   clientPromise = globalWithMongo._mongoClientPromise
 } else {
   // In production mode, it's best to not use a global variable.
-  client = new MongoClient(uri, options)
   clientPromise = connectToDatabase()
 }
 
