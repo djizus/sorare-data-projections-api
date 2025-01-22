@@ -14,7 +14,7 @@ interface DiscordGuild {
   permissions: string;
 }
 
-export const authOptions: AuthOptions = {
+const authOptions: AuthOptions = {
   adapter: mongoAdapter,
   providers: [
     DiscordProvider({
@@ -63,4 +63,6 @@ export const authOptions: AuthOptions = {
 }
 
 const handler = NextAuth(authOptions)
-export { handler as GET, handler as POST } 
+
+export { handler as GET, handler as POST }
+export { authOptions } 
