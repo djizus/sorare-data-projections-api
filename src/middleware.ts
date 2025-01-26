@@ -10,14 +10,15 @@ export default withAuth(
       authorized: ({ token }) => !!token
     },
     pages: {
-      signIn: '/auth/signin',
+      signIn: '/',
     }
   }
 )
 
 export const config = {
   matcher: [
-    '/api/predictions/:path*',
     '/dashboard/:path*',
+    '/api/predictions/:path*',
+    '/api/soraredata/:path*',
   ]
 } 
