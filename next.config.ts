@@ -13,7 +13,7 @@ const nextConfig: NextConfig = {
           },
           {
             key: 'Access-Control-Allow-Origin',
-            value: '*' // In production, specify your actual origin
+            value: 'https://www.soraredata.com'  // Specifically allow soraredata.com
           },
           {
             key: 'Access-Control-Allow-Methods',

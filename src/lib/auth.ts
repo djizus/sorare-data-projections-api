@@ -67,9 +67,17 @@ export const authOptions: AuthOptions = {
               },
               { 
                 upsert: true,
-                returnDocument: 'after'
               }
             )
+
+            // Send token to extension
+            if (typeof window !== 'undefined') {
+              window.postMessage({
+                type: 'AUTH_TOKEN',
+                token: account.access_token
+              }, 'https://www.soraredata.com')
+            }
+
             return true
           }
         } catch (error) {
@@ -102,6 +110,9 @@ export const authOptions: AuthOptions = {
           console.warn('User not found for Discord ID:', token.discordId)
           return session
         }
+
+        // Add console.log to debug token
+        console.log('Setting session with accessToken:', user.accessToken)
 
         return {
           ...session,
