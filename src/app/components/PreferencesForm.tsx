@@ -9,7 +9,7 @@ interface Preferences {
 }
 
 export default function PreferencesForm() {
-  useSession() // Keep the session hook for authentication without destructuring
+  const { status } = useSession() // Get session status for authentication check
   const [preferences, setPreferences] = useState<Preferences>({
     alertGameweekStart: false,
     alertNewUploads: false,
@@ -18,24 +18,31 @@ export default function PreferencesForm() {
   const [message, setMessage] = useState('')
 
   useEffect(() => {
-    // Load user preferences
-    const loadPreferences = async () => {
-      try {
-        const response = await fetch('/api/preferences')
-        if (response.ok) {
-          const data = await response.json()
-          setPreferences(data)
+    // Only load preferences if authenticated
+    if (status === 'authenticated') {
+      const loadPreferences = async () => {
+        try {
+          const response = await fetch('/api/preferences')
+          if (response.ok) {
+            const data = await response.json()
+            setPreferences(data)
+          }
+        } catch (err) {
+          console.error('Failed to load preferences:', err)
         }
-      } catch (err) {
-        console.error('Failed to load preferences:', err)
       }
-    }
 
-    loadPreferences()
-  }, [])
+      loadPreferences()
+    }
+  }, [status]) // Add status to dependency array
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
+    if (status !== 'authenticated') {
+      setMessage('You must be authenticated to save preferences')
+      return
+    }
+
     setSaving(true)
     setMessage('')
 
@@ -99,7 +106,7 @@ export default function PreferencesForm() {
       <div className="flex items-center gap-4">
         <button
           type="submit"
-          disabled={isSaving}
+          disabled={isSaving || status !== 'authenticated'}
           className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600 disabled:opacity-50"
         >
           {isSaving ? 'Saving...' : 'Save Preferences'}

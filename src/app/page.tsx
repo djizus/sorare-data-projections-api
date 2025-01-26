@@ -12,7 +12,7 @@ export default async function Home() {
 
   return (
     <div className="flex min-h-screen flex-col items-center justify-center p-8">
-      <h1 className="text-4xl font-bold mb-8">Sorare Data Projections API</h1>
+      <h1 className="text-4xl font-bold mb-8">Scrappo</h1>
       <div className="space-y-4 text-center">
         <SignInButton />
       </div>

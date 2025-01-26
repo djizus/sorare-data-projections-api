@@ -3,8 +3,8 @@ import './globals.css'
 import type { Metadata } from 'next'
 
 export const metadata: Metadata = {
-  title: 'Sorare Data Projections API',
-  description: 'Upload your Sorare Data projections',
+  title: 'Scrappo',
+  description: 'Manage your Scrappo preferences',
 }
 
 export default function RootLayout({
