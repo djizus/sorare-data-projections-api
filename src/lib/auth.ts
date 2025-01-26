@@ -70,14 +70,6 @@ export const authOptions: AuthOptions = {
               }
             )
 
-            // Send token to extension
-            if (typeof window !== 'undefined') {
-              window.postMessage({
-                type: 'AUTH_TOKEN',
-                token: account.access_token
-              }, 'https://www.soraredata.com')
-            }
-
             return true
           }
         } catch (error) {
