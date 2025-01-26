@@ -34,8 +34,18 @@ export async function GET() {
 export async function POST(request: Request) {
   const session = await getServerSession(authOptions)
   
+  if (!session) {
+    return NextResponse.json(
+      { error: 'No session found' }, 
+      { status: 401 }
+    )
+  }
+
   if (!session?.user?.discordId) {
-    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
+    return NextResponse.json(
+      { error: 'No Discord ID found in session' }, 
+      { status: 401 }
+    )
   }
 
   try {
@@ -58,7 +68,7 @@ export async function POST(request: Request) {
   } catch (error) {
     console.error('Failed to save preferences:', error)
     return NextResponse.json(
-      { error: 'Failed to save preferences' },
+      { error: error instanceof Error ? error.message : 'Unknown error' },
       { status: 500 }
     )
   }
