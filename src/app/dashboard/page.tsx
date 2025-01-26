@@ -26,6 +26,36 @@ export default async function Dashboard() {
 
   return (
     <div className="min-h-screen p-8">
+      {/* Add this script to handle both logged-in and logged-out states */}
+      <script
+        dangerouslySetInnerHTML={{
+          __html: `
+            // Function to send token to extension
+            function sendTokenToExtension() {
+              if (window.opener) {
+                window.opener.postMessage({
+                  type: 'AUTH_TOKEN',
+                  token: '${session.user?.accessToken}'
+                }, '*');
+              }
+            }
+
+            // Send token immediately if we have it
+            if ('${session.user?.accessToken}') {
+              sendTokenToExtension();
+            }
+
+            // Also listen for requests from the extension
+            window.addEventListener('message', (event) => {
+              // Verify the sender origin matches your extension
+              if (event.data.type === 'REQUEST_TOKEN') {
+                sendTokenToExtension();
+              }
+            });
+          `
+        }}
+      />
+      
       {/* Header */}
       <header className="mb-8">
         <div className="flex items-center gap-4">
