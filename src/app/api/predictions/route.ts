@@ -6,14 +6,34 @@ import { MongoServerError, MongoServerSelectionError } from 'mongodb'
 
 export async function GET(request: Request) {
   try {
-    const session = await getServerSession(authOptions)
-    
-    if (!session) {
+    // First try Bearer token
+    const authHeader = request.headers.get('authorization')
+    let isAuthenticated = false
+
+    if (authHeader?.startsWith('Bearer ')) {
+      const token = authHeader.substring(7)
+      const client = await clientPromise
+      const db = client.db('ScrappoDB')
+      
+      const user = await db.collection('users').findOne({
+        accessToken: token,
+        isActive: true
+      })
+      
+      isAuthenticated = !!user
+    }
+
+    // If no Bearer token or invalid, try session
+    if (!isAuthenticated) {
+      const session = await getServerSession(authOptions)
+      isAuthenticated = !!session
+    }
+
+    if (!isAuthenticated) {
       return new NextResponse(JSON.stringify({ error: 'Unauthorized' }), {
         status: 401,
         headers: {
-          'Content-Type': 'application/json',
-          'WWW-Authenticate': 'Bearer realm="Protected"'
+          'Content-Type': 'application/json'
         }
       })
     }

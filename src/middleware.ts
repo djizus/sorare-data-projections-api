@@ -17,8 +17,6 @@ export default withAuth(
 
 export const config = {
   matcher: [
-    '/dashboard/:path*',
-    '/api/predictions/:path*',
-    '/api/soraredata/:path*',
+    '/dashboard/:path*'
   ]
 } 
